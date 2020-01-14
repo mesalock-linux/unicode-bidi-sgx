@@ -13,6 +13,7 @@
 
 use std::cmp::max;
 use std::ops::Range;
+use std::prelude::v1::*;
 
 use super::char_data::BidiClass;
 use super::level::Level;
@@ -41,7 +42,7 @@ pub struct IsolatingRunSequence {
 /// whose matching PDI is the first character of the next level run in the sequence.
 ///
 /// Note: This function does *not* return the sequences in order by their first characters.
-#[cfg_attr(feature = "flame_it", flame)]
+//#[cfg_attr(feature = "flame_it", flame)]
 pub fn isolating_run_sequences(
     para_level: Level,
     original_classes: &[BidiClass],
@@ -137,7 +138,7 @@ pub fn isolating_run_sequences(
 /// Finds the level runs in a paragraph.
 ///
 /// <http://www.unicode.org/reports/tr9/#BD7>
-fn level_runs(levels: &[Level], original_classes: &[BidiClass]) -> Vec<LevelRun> {
+pub fn level_runs(levels: &[Level], original_classes: &[BidiClass]) -> Vec<LevelRun> {
     assert_eq!(levels.len(), original_classes.len());
 
     let mut runs = Vec::new();

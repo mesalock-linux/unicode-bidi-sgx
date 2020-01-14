@@ -14,6 +14,7 @@
 //! <http://www.unicode.org/reports/tr9/#BD2>
 
 use std::convert::{From, Into};
+use std::prelude::v1::*;
 
 use super::char_data::BidiClass;
 
@@ -29,7 +30,7 @@ use super::char_data::BidiClass;
 /// <http://www.unicode.org/reports/tr9/#BD2>
 #[derive(Copy, Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct Level(u8);
+pub struct Level(pub u8);
 
 pub const LTR_LEVEL: Level = Level(0);
 pub const RTL_LEVEL: Level = Level(1);

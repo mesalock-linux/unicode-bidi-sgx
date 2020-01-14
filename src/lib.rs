@@ -60,6 +60,15 @@
 #![cfg_attr(feature="flame_it", feature(plugin, custom_attribute))]
 #![cfg_attr(feature="flame_it", plugin(flamer))]
 
+#![cfg_attr(all(feature = "mesalock_sgx",
+                not(target_env = "sgx")), no_std)]
+#![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), feature(rustc_private))]
+
+#[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
+#[macro_use]
+extern crate sgx_tstd as std;
+
+use std::prelude::v1::*;
 
 #[macro_use]
 extern crate matches;
@@ -86,7 +95,7 @@ mod prepare;
 
 pub use char_data::{BidiClass, bidi_class, UNICODE_VERSION};
 pub use level::{Level, LTR_LEVEL, RTL_LEVEL};
-pub use prepare::LevelRun;
+pub use prepare::{LevelRun, IsolatingRunSequence, level_runs, isolating_run_sequences, removed_by_x9, not_removed_by_x9};
 
 use std::borrow::Cow;
 use std::cmp::{max, min};
@@ -674,7 +683,7 @@ mod tests {
             }
         );
 
-        /// BidiTest:69635 (AL ET EN)
+        // BidiTest:69635 (AL ET EN)
         let bidi_info = BidiInfo::new("\u{060B}\u{20CF}\u{06F9}", None);
         assert_eq!(bidi_info.original_classes, vec![AL, AL, ET, ET, ET, EN, EN]);
     }
@@ -714,22 +723,22 @@ mod tests {
 
     #[test]
     fn test_reorder_line() {
-        /// Bidi_Class: L L L B L L L B L L L
+        // Bidi_Class: L L L B L L L B L L L
         assert_eq!(
             reorder_paras("abc\ndef\nghi"),
             vec!["abc\n", "def\n", "ghi"]
         );
 
-        /// Bidi_Class: L L EN B L L EN B L L EN
+        // Bidi_Class: L L EN B L L EN B L L EN
         assert_eq!(
             reorder_paras("ab1\nde2\ngh3"),
             vec!["ab1\n", "de2\n", "gh3"]
         );
 
-        /// Bidi_Class: L L L B AL AL AL
+        // Bidi_Class: L L L B AL AL AL
         assert_eq!(reorder_paras("abc\nابج"), vec!["abc\n", "جبا"]);
 
-        /// Bidi_Class: AL AL AL B L L L
+        // Bidi_Class: AL AL AL B L L L
         assert_eq!(reorder_paras("ابج\nabc"), vec!["\nجبا", "abc"]);
 
         assert_eq!(reorder_paras("1.-2"), vec!["1.-2"]);
@@ -812,7 +821,7 @@ mod tests {
     #[test]
     fn test_reordered_levels() {
 
-        /// BidiTest:946 (LRI PDI)
+        // BidiTest:946 (LRI PDI)
         let text = "\u{2067}\u{2069}";
         assert_eq!(
             reordered_levels_for_paras(text),
